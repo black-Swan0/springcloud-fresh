@@ -1,0 +1,33 @@
+server:
+  port: 5566
+  
+# 配置为本地读取
+spring:
+  application:
+    name: fresh-config-server
+  profiles:
+    active: native # 说明是本地配置中心，即从本地读取配置文件
+  cloud:
+    config:
+      server:
+        native:
+          search-location: classpath:/config  # 从当前项目的类路下config目录下找配置文件
+      
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://swan:123456@127.0.0.1:6868/eureka
+      
+# 从git上面读取
+#   spring:
+#    application:
+#      name: fresh-config-server
+#    cloud:
+#      config:
+#        server:
+#        git:
+#          uri:   # git项目路径
+#          username: # 登录账号
+#         password: # 登录密码
+#           default-label: master #分支
+#           search-paths:  # 配置文件路径径

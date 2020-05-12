@@ -1,0 +1,282 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>天天生鲜-注册</title>
+ <link rel="shortcut icon" href="front/images/copylogo.png">
+ <link rel="stylesheet" href="front/css/reset.css">
+ <link rel="stylesheet" href="front/css/reg.css">
+ <link rel="stylesheet" href="front/css/unlock.css">
+ <link rel="stylesheet" href="front/css/foot.css">
+ <script type="text/javascript" src="front/js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="backer/js/vue@2.6.11.js"></script>
+<script type="text/javascript" src="backer/js/axios.min.js"></script>
+<script type="text/javascript" src="backer/js/qs.js"></script>
+<script type="text/javascript" src="backer/js/jsencrypt.min.js"></script>
+ <script src="front/js/unlock.js"></script>
+</head>
+
+<body>
+	<!-- 注册布局 -->
+	<div class="register_con">
+		<div class="l_con fl">
+        	 <a href="#" class="reg_logo fr"><img src="front/images/logo.png"></a>
+        	 <div class="reg_slogan fr">足不出户 · 新鲜每一天</div>
+       		 <div class="reg_banner fr"></div>
+        </div>
+
+		<div class="r_con fr" id="register_div">
+        	<div class="reg_title clearfix">
+            	<h1 class="fl">用户注册</h1>
+            	<a href="login.html" class="fr">登录</a>
+            </div>
+        	<div class="reg_form clearfix">
+             	<form>
+                    <ul>
+                        <li>
+                            <label for="nickname">用户名:</label>
+                            <input type="text" id="nickname" name="nickname" @focus="nickname_focus()" @blur="nickname_blur()" v-model="nickname" placeholder="请输入您的用户名" required >
+                            <span class="error_tip" :style="{'display' : nickActive ? 'inline' : ''}">{{nick_msg}}</span>
+                        </li>
+                        <li>
+                            <label for="pwd">密码:</label>
+                            <input type="password" id="pwd" name="pwd" @focus="pwd_focus()" @blur="pwd_blur()"  v-model="pwd" placeholder="请输入6~15位字母、数字还可包含特殊字符">
+                            <span class="error_tip">提示信息</span>
+                        </li>
+                        <li>
+                            <label for="cpwd">确认密码:</label>
+                            <input type="password" id="cpwd" name="cpwd" @focus="cpwd_focus()" @blur="cpwd_blur()" v-model="cpwd" placeholder="请输入确认密码">
+                            <span class="error_tip">提示信息</span>
+                        </li>
+                         <li>
+                            <label for="tel">电话号码:</label>
+                            <input type="text" id="tel" name="tel" @focus="tel_focus()" @blur="tel_blur()" v-model="tel" placeholder="请输入以1开头的11位有效电话号码">
+                            <input type="button" id="getCode" name=""  :disabled="code_btn" value="获取验证码" @click="getVcode()">
+                            <span id="tel_msg_show" class="error_tip yzm_tip" >{{tel_msg}}</span>
+                        </li>
+                        <li>
+                            <label for="yzm">验证码:</label>
+                            <input type="text" id="yzm" name="yzm" @focus="yzm_focus()" v-model="yzm" placeholder="请输入验证码">
+                            <span id="yzm_errsmg" class="error_tip">{{yzm_errmsg}}</span>
+                        </li>
+                        <li>
+                            <label for="email">邮箱:</label>
+                            <input type="text" id="email" name="email" @focus="email_focus()" @blur="email_blur()" v-model="email" placeholder="请输入有效的邮箱地址">
+                            <!-- 上课测试使用邮箱发送，实际是手机验证码发送
+                            <input type="button" id="getEmailCode" name=""  :disabled="code_btn" value="获取验证码" @click="getEmailVcode()">
+                             -->
+                            <span class="error_tip" :style="{'display' : email_msgActive ? 'inline' : ''}">{{email_msg}}</span>
+                        </li>
+                        <!--  
+                        <li  class="row">
+                        	 滑块验证
+                            <div class="bar"></div>
+                        </li>
+                        -->
+                        <li class="agreement">
+                            <input type="checkbox" id="allow" @click="allow_click()" name="allow" checked>
+                            <label for="allow">同意<a href="#">"天天生鲜用户使用协议"</a></label>
+                            <span class="error_tip2">提示信息2</span>
+                        </li>
+                         <li>
+                            <input type="button" id="reg" name="" onClick="checkRegister()" value="注 册">
+                            <span id="errmsg" ref="errmsg">{{errmsg}}</span>
+                        </li>
+                    </ul>
+                </form>
+        	</div>
+        </div>
+	</div>
+    
+    <!-- 版权所有 -->
+    <div class="footer">
+    	<div class="foot_link">
+        	<a href="#">关于我们</a> <span> | </span>
+            <a href="#">联系我们</a> <span> | </span>
+            <a href="#">招聘广告</a> <span> | </span>
+            <a href="#">友情链接</a>
+        </div>
+    	<p>CopyRight &copy; 2019 衡阳市源辰信息科技有限公司 All Rights Reserverd</p>
+        <p>电话：0734-8355998 湘ICP备16015987号</p>
+    </div>
+    <script src="front/js/register.js"></script>
+    <script>
+    var publicKey = '';
+    var encrypt = new JSEncrypt();
+    var vm_register = new Vue({
+    	el: "#register_div",
+    	data: {
+    		nickname: "swan",
+    		pwd: "",
+    		cpwd: "",
+    		tel: "",
+    		yzm: "",
+    		email: "834812608@qq.com",
+    		errmsg: "",
+    		yzm_errmsg: "",
+    		tel_msg: "",
+    		email_msgActive: false,
+    		nickActive: false,
+    		code_btn: false,
+    		nick_msg: "",
+    		email_msg: "邮箱格式错误",
+    		vcode: ""  // 获取验证码
+    	},
+    	mounted: function() {
+    		axios({
+    			url : 'admin/getPulicKey',
+    			method: 'post'
+    			
+    		})
+    		.then(response => {
+    			publicKey = response.data
+    		})
+    		.catch(function(error) {
+    			alert("请求失败，请稍后重试...");
+    		})
+    	},
+    	methods: {
+    		register: async function() {
+    			errmsg_hide();
+    			
+    			if (this.nickname == "" || this.pwd == "" || this.cpwd == "" || this.tel == "" || this.yzm == "" || this.email == "") {
+    				this.errmsg = "信息不能为空"
+    				errmsg_show();
+    				return;
+    			}
+    			// 先获取验证码
+    			// await this.getVcode()  // 同步传输
+    			
+    			if (this.yzm != this.vcode) {  // 说明输入的验证码错误
+    				this.yzm_errmsg = "验证码输入错误"
+    				yzm_errsmg_show();
+    				return;
+    			}
+    			console.info(publicKey)
+    			encrypt.setPublicKey(publicKey);
+    			this.pwd = encrypt.encrypt(this.pwd);  // 加密后的字符串
+    			console.info(this.pwd)
+				let params = qs.stringify({
+					nickname: this.nickname,
+					pwd: this.pwd,
+					tel: this.tel,
+					email: this.email
+				})
+				this.pwd = this.cpwd;
+    			// 注册用户
+    			axios.post("menber/add", params)
+    			.then(result => {
+    				if (result.data == -1) {
+    					this.errmsg = "信息填写不完整"
+    	    			errmsg_show();
+    	    			return;
+    				}
+    				location.href = "login.html"
+    			})
+    			.catch(function(e) {
+    				alert("注册失败，请联系管理员...\n" + e)
+    			})
+    		},
+    		
+    		getVcode: async function() {
+    			console.info("vue的获取验证码...")
+    			if (this.tel == '' || !check_tel()) {
+    				return;
+    			}
+    			
+    			let dataPra = qs.stringify({
+    				phone: this.tel
+    			})
+    			await axios.post("menber/vcode", dataPra)
+    			.then(result => {
+    				this.vcode = result.data
+    				this.tel_msg = "验证码发送成功..."
+    				this.code_btn = true;
+    				tel_msg_rightShow();
+    			})
+    			.catch(function(e) {
+    				alert("获取验证码失败,请联系管理员...\n" + e)
+    			})
+    		},
+    		getEmailVcode: function() {  // 获取邮箱验证码
+    			axios.post("member/code", qs.stringify({receive: this.email, name:this.nickname}))
+    			.then(result => {
+    				if (result.data.code == 200) {
+    					alert("验证码发送成功")
+    				} else if (result.data.code == 500) {
+    					alert("验证码发送失败")
+    				}
+    			})
+    			.catch(function(e) {
+    				alert("邮箱验证码发送失败，请联系管理员\n" + e)
+    			})
+    		},
+    		nickname_focus: function() {
+    			this.nickActive = false;
+    			nickname_focus_jq();
+    		},
+    		nickname_blur: function() {
+    			if (nickname_blur_jq()) {
+    				axios.post("menber/checkNickname", qs.stringify({nickName: this.nickname}))
+    				.then(result => {
+    					// console.info(result.data)
+    					// console.info(result.data == "")
+    					if (result.data != "") { // 说明已经被注册
+    						this.nick_msg = "该用户已经注册";
+    						this.nickActive = true;
+    					} else {
+    						this.nickActive = false;
+    					}
+    				})
+    				.catch(function(e) {
+    					alert("检查用户名失败，请稍后重试\n" + e)
+    				})
+    			} else {
+    				this.nickActive = true;
+    			}
+    			
+    		},
+    		pwd_focus: function() {
+    			pwd_focus_jq();
+    		},
+			pwd_blur: function() {
+				pwd_blur_jq();
+    		},
+    		cpwd_focus: function() {
+    			cpwd_focus_jq();
+    		},
+			cpwd_blur: function() {
+				cpwd_blur_jq();
+    		},
+    		tel_focus: function() {
+    			tel_focus_jq();
+    		},
+			tel_blur: function() {
+				tel_blur_jq();
+    		},
+    		allow_click: function() {
+    			allow_click_jq();
+    		},
+    		email_focus: function() {
+    			this.email_msgActive = false;
+    		},
+    		yzm_focus: function() {
+    			yzm_errsmg_hide();
+    		},
+    		email_blur: function() {  // 邮箱失焦
+    			// 邮箱验证
+    			// 规则
+    			var reg = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
+    			if (!reg.test(this.email)) {
+    				this.email_msgActive = true;
+    			}
+    		}
+    	}
+    })
+    
+    
+    	$('.bar').slideToUnlock({
+		});
+    </script>
+</body>
+</html>
